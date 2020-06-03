@@ -1,5 +1,5 @@
 # SOLID programming principles 
-==============
+
 ## Definition
 
 Wikipedia explains [SOLID](https://en.wikipedia.org/wiki/SOLID) in the following way:
@@ -23,7 +23,7 @@ and it stands for
 
 ## Single Responsibility Principle (SRP)
 
-Oficial definition
+Official definition
 
 > Every module should have one single responsibility. 
 > This means two separate concerns/responsibilities/tasks should always be implemented in separate modules. 
@@ -45,32 +45,25 @@ Real-world example
 
 **Programmatic Example**
 
-👎 BAD example
+👎 BAD example:
 
 ```java
-
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.sql.DriverManager;
-import java.sql.Connection;
-import java.sql.ResultSet;import java.sql.Statement;
-
 class UserController { 
 
-    public void writeUserToFile(User user, Path file) {
-        Files.write(file, serialize(user), StandardOpenOption.APPEND);
+    public void writeUserToFile(User user, Path file) throws IOException {
+        Files.write(file, serializeUser(user), StandardOpenOption.APPEND);
     }
     
     public byte[] serializeUser(User user) {
         return user.toString().getBytes();
     }
-
-    public User readUserFromDatabase() {
+    
+    public User readUserFromDatabase() throws ClassNotFoundException, SQLException {
         Class.forName("oracle.jdbc.driver.OracleDriver");
         Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:8888:oracle");
         Statement statement = conn.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from users where rownum = 1");
-
+    
         return new User(resultSet.getString(1), resultSet.getString(2));
     }
 }
@@ -78,5 +71,10 @@ class UserController {
 
 Why is it bad?
 
-`UserController.java` is responsible for writing to file, fetching user(!) data from a database(!!) and serialization logic(!!!). 
+`UserController.java` is responsible for writing to file **(!)**, fetching user data from a database **(!)** and serialization logic **(!!!)**. 
 
+Possible solutions: 
+
+- A
+- B
+- C
