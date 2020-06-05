@@ -138,6 +138,11 @@ So...
 
 **Real-world example**
 
+> Imagine you an inventor of a [screwdriver](https://en.wikipedia.org/wiki/Screwdriver), and you your first creation - a [flat-blade](https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Screw_Driver_display.jpg/250px-Screw_Driver_display.jpg) screwdriver is 
+> a great success but people contact you and say that they want to have a [Phillips or Frearson](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Frearson_vs_Phillips.svg/800px-Frearson_vs_Phillips.svg.png) screw heads and not only flat-blade ones. So what do you do? You need to go back to the drawing board, 
+> create a new iron cast, test the screwdriver with a new tip. It works and everyone is happy, until people come back to you and say they want 3 more types, then 5 more types, then 10 more types, you end up with [20+ forms](https://www.mechanicalbooster.com/wp-content/uploads/2018/05/Different-Types-of-Scredrivers.jpg).
+> Maybe it would've been better to create a single handle but extend it with [multiple tips](https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Set_of_security_screw_driver_bits.jpg/1280px-Set_of_security_screw_driver_bits.jpg)? 
+
 **Programmatic Example**
 
 👎 BAD:
@@ -145,6 +150,30 @@ So...
 
 ```java
 
+enum Color { RED, GREEN, BLUE }
+enum Size { SMALL, MEDIUM, LARGE, HUGE }
+enum Category { HOME, OFFICE, SPORT }
+
+class ProductFilter {
+  // initial implementation
+  public Stream<Product> filterByColor(List<Product> products, Color color) {
+    return products.stream().filter(p -> p.color == color);
+  }
+  
+  
+  public Stream<Product> filterBySize(List<Product> products, Size size) {
+    return products.stream().filter(p -> p.size == size);
+  }
+  
+  // added filter after requirements change
+  public Stream<Product> filterBySizeAndColor(List<Product> products, Size size, Color color) {
+    return products.stream().filter(p -> p.size == size && p.color == color);
+  }
+  //  
+  // additional filters to filter category, size + category, category + color, category + size + color;
+  // which leads to state space explosion (combinatorial explosion)  
+  // See https://en.wikipedia.org/wiki/Model_checking & https://en.wikipedia.org/wiki/Combinatorial_explosion
+}
 
 ```
 
