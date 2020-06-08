@@ -21,7 +21,7 @@ and it stands for
 * **D**ependency Inversion Principle
 
 
-##Single Responsibility Principle (SRP)
+## Single Responsibility Principle (SRP)
 
 **Official definition**
 
@@ -224,7 +224,7 @@ public class SizeSpecification implements Specification<Product> {
 }
 ```
 
-See also [examples] (src\main\java\com\github\eugenenosenko\solid\ocp\good)
+See also [ocp folder](src/main/java/com/github/eugenenosenko/solid/ocp) for examples
 
 ## Liskov Substitution Principle (LSP)
 
