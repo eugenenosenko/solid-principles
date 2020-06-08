@@ -339,10 +339,13 @@ See [lsp folder](src/main/java/com/github/eugenenosenko/solid/lsp) for more exam
 ## Interface Segregation Principle (ISP)
 
 **Official definition**
+> In the field of software engineering, the interface-segregation principle (ISP) states that no client should be forced 
+> to depend on methods it does not use. ISP splits interfaces that are very large into smaller and more specific ones so that 
+> clients will only have to know about the methods that are of interest to them. Such shrunken interfaces are also called role interfaces.
+> ISP is intended to keep a system decoupled and thus easier to refactor, change, and redeploy
 
 **In plain words**
-
-**Real-world example**
+> Several, specific, interfaces are better than one general-purpose interface (fat interface)
 
 **Programmatic Example**
 
@@ -350,23 +353,86 @@ See [lsp folder](src/main/java/com/github/eugenenosenko/solid/lsp) for more exam
 
 ```java
 
+public interface Printer {
+  void print(String text);
+  void scan();
+  void fax();
+}
 
+public class MultiFunctionalPrinter implements Printer {
+  @Override
+  public void print(String text) { System.out.println("Printing" + " " + text); }
+
+  @Override
+  public void scan() { System.out.println("Scanning..."); }
+
+  @Override
+  public void fax() { System.out.println("Faxing..."); }
+}
+
+
+public class SimplePrinter implements Printer {
+  @Override
+  public void print(String text) { System.out.println("Printing: " + text); }
+
+  @Override
+  public void scan() { /* no implementation */ }
+
+  @Override
+  public void fax() { /* no implementation */ }
+}
 ```
+
 **Why is it bad?**
+- By using this complex `Printer` interface you're giving the user of the `SimplePrinter` an indication 
+  that you are supporting `scan` and `fax` functions, which might lead to surprises when they realise nothing is happening
+
 
 **Possible solutions** 
+- Breaking the complex, general-purpose interface into a several smaller ones that are more specific 
+- Avoid creating interfaces if you know that classes that will be implementing them, might not be able to implement all the methods
 
-- 
-- 
 👍 GOOD:
 ```java
 
+public interface Fax { 
+    void fax();
+}
 
+public interface Printer {
+  void print(String text);
+}
+
+public interface Scanner {
+  void scan();
+}
+
+public class ScanningPrinter implements Printer, Scanner {
+  @Override
+  public void print(String text) {
+    System.out.println("Printing " + text);
+  }
+
+  @Override
+  public void scan() {
+    System.out.println("Scanning");
+  }
+}
 ```
+
+See [isp folder](src/main/java/com/github/eugenenosenko/solid/isp) for examples 
 
 ## Dependency Inversion Principle (DIP)
 
 **Official definition**
+> Dependency inversion principle is a specific form of decoupling software modules. When following this principle, 
+> the conventional dependency relationships established from high-level, policy-setting modules to low-level, 
+> dependency modules are reversed, thus rendering high-level modules independent of the low-level module implementation details. 
+> The principle states: 
+>
+> 1) High-level modules should not depend on low-level modules. Both should depend on abstractions (e.g. interfaces).
+> 2) Abstractions should not depend on details. Details (concrete implementations) should depend on abstractions.
+
 
 **In plain words**
 
@@ -377,6 +443,17 @@ See [lsp folder](src/main/java/com/github/eugenenosenko/solid/lsp) for more exam
 👎 BAD:
 
 ```java
+enum Relationship { PARENT, CHILD, SIBLING }
+
+class Person {
+  public String name;
+
+  public Person(String name) {
+    this.name = name;
+  }
+}
+
+
 
 
 ```
