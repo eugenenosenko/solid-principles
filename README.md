@@ -96,7 +96,7 @@ class UserPersistence {
     
     UserPersistence(ObjectSerializer<User> userSerializer) { this.userSerializer = userSerializer;  }
     
-    public User readUser() throws ClassNotFoundException, SQLException {
+    public User readUser()  throws SQLException {
         // code omitted 
     }
     
@@ -435,29 +435,58 @@ See [isp folder](src/main/java/com/github/eugenenosenko/solid/isp) for examples
 
 
 **In plain words**
-
-**Real-world example**
+> High-level modules ( classes / modules that deal with business logic ) should not directly use classes / modules that
+> operate on data but instead talk to those classes via a layer of abstraction, i.e. an interface
 
 **Programmatic Example**
 
 👎 BAD:
 
 ```java
-enum Relationship { PARENT, CHILD, SIBLING }
+class User {
+    public final String name,lastName;
 
-class Person {
-  public String name;
-
-  public Person(String name) {
-    this.name = name;
-  }
+    User(String name, String lastName) { 
+        this.name = name; 
+        this.lastaName= lastName; 
+    }   
 }
 
 
+class UserRetriever { // low-level module
+    private final List<User> users = new ArrayList<>();    
+    
+    UserRetriever() {
+        this.users = fetchUserFromWeb();    
+    }
+    
+    // (!) exposing storage implementation as a public getter
+    List<User> getUsers() { return users; }
+}
 
 
+class UserSearchService { // high-level module
+
+    private final UserRetriever userRetriever;
+
+    UserSearcherService(UserRetriver userRetriever) {
+        this.userRetriever = userRetriever;
+    }   
+
+    public User getUserWithName(String name) {
+        return userRetriever.getUsers().stream()
+            .filter ( user -> user.name.equals(name))
+            .findFirst()
+            .orElseThrow();
+    }
+}
 ```
+
 **Why is it bad?**
+- `UserRetriever` is a low-level module because it's responsibility is user list manipulation. That is its only responsibility (see Single Responsibility Principle), but it exposes its internal data storage via a getter, so it's functionality is not encapsulated **(!)**
+- `UserSearchService` on the other hand is a high-level module because it's closer to the business logic, and it depends on `UserRetriever`, 
+a lower-level module and if for example we at some point will not want to use `List<User>` but `Map` or `Set` we can't easily do that because it's hardwired via `List<User> getUsers()`
+- 
 
 **Possible solutions** 
 - 
