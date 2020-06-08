@@ -333,6 +333,8 @@ class ShapeFactory {
     }   
 }
 ```
+See [lsp folder](src/main/java/com/github/eugenenosenko/solid/lsp) for more examples 
+
 
 ## Interface Segregation Principle (ISP)
 
