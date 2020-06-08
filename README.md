@@ -21,7 +21,7 @@ and it stands for
 * **D**ependency Inversion Principle
 
 
-## Single Responsibility Principle (SRP)
+##Single Responsibility Principle (SRP)
 
 **Official definition**
 
@@ -152,7 +152,6 @@ So...
 
 enum Color { RED, GREEN, BLUE }
 enum Size { SMALL, MEDIUM, LARGE, HUGE }
-enum Category { HOME, OFFICE, SPORT }
 
 class ProductFilter {
   // initial implementation
@@ -165,29 +164,67 @@ class ProductFilter {
     return products.stream().filter(p -> p.size == size);
   }
   
-  // added filter after requirements change
+  // new feature to sort by size and color requires a change in code
   public Stream<Product> filterBySizeAndColor(List<Product> products, Size size, Color color) {
     return products.stream().filter(p -> p.size == size && p.color == color);
   }
-  //  
-  // additional filters to filter category, size + category, category + color, category + size + color;
-  // which leads to state space explosion (combinatorial explosion)  
-  // See https://en.wikipedia.org/wiki/Model_checking & https://en.wikipedia.org/wiki/Combinatorial_explosion
 }
-
 ```
 
 **Why is it bad?**
+- Chance of breaking existing functionality
+- Each subsequent change to the original code requires rigorous testing and verifying of original functionality.
 
 **Possible solutions** 
+- Extend / implement `ProductFilter.java` with custom filtering method
+- If `ProductFilter.java` is final, then use delegation instead
+- When designing your own library make sure that the code that will be used by other developers is generic and open for extension
 
-- 
-- 
 👍 GOOD:
 ```java
+enum Category { HOME, OFFICE, SPORT }
 
+class CategoryProductFilter extends ProductFilter {
+    
+    public Stream<Product> filterBySizeAndCategory(List<Product> products, Size size, Category category) {
+        return super.filterBySize(products, size).filter(product -> product.getCategory() == category);
+    }
+}
 
 ```
+👍 BEST:
+
+Design patterns i.e. `Specification` design patterns make it easier to
+create code that is open for extension and closed for modification
+
+```java
+interface Specification<T> {
+  boolean isSatisfied(T item);
+}
+
+interface Filter<T> {
+  Stream<T> filter(List<T> items, Predicate<T> spec);
+}
+
+class BetterFilter {
+
+      @Override
+      public Stream<Product> filter(List<Product> items, Specification<Product> spec) {
+        return items.stream().filter(spec::test);
+      }
+}
+
+public class SizeSpecification implements Specification<Product> {
+  private final Size size;
+
+  public SizeSpecification(Size size) { this.size = size; }
+
+  @Override
+  public boolean test(Product p) { return p.size == size; }
+}
+```
+
+See also [examples] (src\main\java\com\github\eugenenosenko\solid\ocp\good)
 
 ## Liskov Substitution Principle (LSP)
 
