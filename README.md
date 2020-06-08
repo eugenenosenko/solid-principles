@@ -229,29 +229,109 @@ See also [examples] (src\main\java\com\github\eugenenosenko\solid\ocp\good)
 ## Liskov Substitution Principle (LSP)
 
 **Official definition**
+> "Objects in a program should be replaceable with instances of their subtypes without altering the correctness of that program."
+
+> Liskov's notion of a behavioural subtype defines a notion of substitutability for objects; that is, if S is a subtype of T, 
+> then objects of type T in a program may be replaced with objects of type S without altering any of the desirable properties of that program
 
 **In plain words**
+> Derived classes (sub-classes) should extend the base classes without changing their behavior.
 
 **Real-world example**
+> You have a **calculator** in your smartphone, it has some basic functions like add, subtract, multiply and divide and other functions. 
+> But if you rotate your phone horizontally your basic calculator will change to a **scientific calculator** with additional functions like calculating 
+> sin / cos / log / tan etc. In this case  **scientific calculator** is a subtype of **calculator** and what `LSP` says is that scientific calculator's functions
+> like add / subtract / multiply / divide should behave **exactly** the same of those of basic calculator, i.e. `2 * 2` should return `4` whether you are using scientific 
+> calculator or basic calculator.
+
 
 **Programmatic Example**
-
 👎 BAD:
-
 ```java
 
+class Rectangle {
+    int width, height;
 
+    void setWidth(int newWidth) { this.width = newWidth; }
+    void setHeight(int newHeight) { this.height = newHeight; }
+    int getArea () { return width * height; }
+}
+
+class Square extends Rectangle {
+    Square(int side) { this.height = this.width = side; }  
+  
+    @Override
+    void setWidth(int newWidth) { 
+        super.setWidth(newWidth); 
+        super.setHeight(newWidth); 
+    }
+
+    @Override
+    void setHeight(int newHeight) { 
+        super.setWidth(newWidth); 
+        super.setHeight(newWidth); 
+    }
+}
 ```
 **Why is it bad?**
+- In `Square.java` in the methods `setWidth` and `setHeight` we are trying to enforce the square property of the 
+  rectangle by making sure height and width are the same but by now `Square` can't substitute `Rectangle`. See example : 
+- This way, Rectangle can no longer be substituted for a Square because they behave differently
 
+```java
+class Demo {
+    public static void main(String... args) {
+        Rectangle rectangle = new Rectangle();
+        rectangle.setHeight(5);
+        rectangle.setWidth(6);
+        
+        // returns 30!
+        System.out.println(rectangle.getArea());
+        
+        Rectangle square = new Square();
+        square.setHeight(5);
+        square.setWidth(6);
+        
+        // returns 36!
+        System.out.println(square.getArea());
+
+        // false
+        assert square.getArea() == rectangle.getArea();
+    }
+}
+
+```  
 **Possible solutions** 
+- Avoid extending a base class if you know that the basic behaviour needs to be overridden. 
+- If you are creating a base class you might want to consider to make methods responsible for its behaviour as `final` to make sure LSP is not violated
+- Consider `Factory` design pattern if you want to create an object with a specific set of attributes 
 
-- 
-- 
 👍 GOOD:
 ```java
+interface ShapeSpecification<T extends Shape> {
+   boolean isSatisfied(T item);
+}
 
+class SquareSpecification implements ShapeSpecification<Rectangle> {
+    boolean isSatisfied(Rectangle r) { r.getHeight() == r.getWidth(); }
+}
 
+class Rectangle extends Shape {
+    int width, height;
+
+    void setWidth(int newWidth) { this.width = newWidth; }
+    void setHeight(int newHeight) { this.height = newHeight; }
+    int getArea () { return width * height; }
+}    
+
+class ShapeFactory {
+    public static Rectangle createSquare(int side) { 
+        Rectangle rect = new Rectangle();
+        rect.setWidth(side);
+        rect.setHeight(side);
+        return rect;
+    }   
+}
 ```
 
 ## Interface Segregation Principle (ISP)
