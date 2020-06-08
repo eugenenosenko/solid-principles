@@ -6,5 +6,4 @@ public class JustAScanner implements Scanner {
   public void scan() {
     System.out.println("scanning");
   }
-
 }
