@@ -75,7 +75,7 @@ class UserController {
 
 **Why is it bad?**
 
-`UserController.java` is responsible for writing to file **(!)**, fetching user data from a database **(!)** and serialization logic **(!!!)**. 
+- `UserController.java` is responsible for writing to file **(!)**, fetching user data from a database **(!!)** and serialization logic **(!!!)**. 
 
 **Possible solutions** 
 
@@ -85,8 +85,8 @@ class UserController {
 👍 GOOD:
 
 ```java
-class UserController { 
-        
+class UserController {
+
     public void updateUserStatus(User user, Status newStatus) {
         user.setStatus(newStatus);
     }
@@ -445,6 +445,7 @@ See [isp folder](src/main/java/com/github/eugenenosenko/solid/isp) for examples
 ```java
 class User {
     public final String name,lastName;
+    private String id; 
 
     User(String name, String lastName) { 
         this.name = name; 
@@ -489,11 +490,61 @@ a lower-level module and if for example we at some point will not want to use `L
 - 
 
 **Possible solutions** 
-- 
-- 
-👍 GOOD:
+- Introduce an interface layer and make UserRetriever implement it. Interface should expose `high-level` API that is related to data manipulation.
+- `UserSearchService` should depend on that interface instead of `UserRetriever`
+- Remove `getUsers()` method from `UserRetriever` and replace it with high level API 
 
+
+👍 GOOD:
 ```java
 
+class User {
+   // same as before
+}
+interface UserRetriever  {
+  Optional<User> getUserWithId(int id);
+  Optional<List<User>> getUsersWithName(String name) ;
+}
 
+
+class WebUserRetriever implements UserRetriever  { // low-level module
+    // internal storage is no longer exposed
+    private final List<User> users = new ArrayList<>();    
+    
+    WebUserRetriever() {
+        this.users = fetchUserFromWeb();    
+    }
+    
+    @Override
+    Optional<User> getUserWithId(int id) {
+    return userRetriever.getUsers().stream()
+                .filter ( user -> user.id == id)
+                .findFirst();
+    }
+    
+    @Override
+    Optional<List<User>> getUsersWithName(String name) {
+       // implementation
+    }
+}
+
+
+class UserController { // high-level module
+    private final UserRetriever userRetriever;
+
+    UserController(UserRetriver userRetriever) {
+        this.userRetriever = userRetriever;
+    }   
+
+    public boolean isUserAllowedToAccessResource(String username) {
+        Optional<List<User>> usersWithName = userRetriever.getUsersWithName(name);
+        if (usersWithName.isPresent()) {
+            return usersWithName.get().equals("admin");            
+        }
+        return false;
+    }
+}
 ```
+
+In the above example the responsibility of manipulating low-level data is encapsulated within `WebUserRetriever.java` and is not exposed outside of it. 
+A high-level module like `UserController` is dependant of an abstraction: `UserRetriever` interface and if it will want to use some other retriever, DatabaseUserRetriever it can do so without changes to source code.
