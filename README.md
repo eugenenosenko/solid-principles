@@ -548,3 +548,24 @@ class UserController { // high-level module
 
 In the above example the responsibility of manipulating low-level data is encapsulated within `WebUserRetriever.java` and is not exposed outside of it. 
 A high-level module like `UserController` is dependant of an abstraction: `UserRetriever` interface and if it will want to use some other retriever, DatabaseUserRetriever it can do so without changes to source code.
+
+-----------------------------------------------------------------------
+
+### Summary 
+
+Remember that SOLID is a tool and not necessarily the goal itself. Sometimes when starting to work on complex designs 
+it is hard to know right from the start whether you are using the correct abstractions. 
+
+All you have is your best guess of what the application should look like, so first and foremost try to make sure that you design your 
+application to be as simple as possible and when you need to reduce complexity / refactor your application make sure to apply SOLID where possible
+
+It's important to have SOLID principles at the back of your head but if you're not sure about the design make sure that 
+you follow below rules:
+
+- Be explicit, your classes & routines. They have to express clear intent.
+- **Never** expose internal storage implementation.
+- Remove duplications.
+- Your code needs to pass all tests.
+- Don't introduce functionality that you don't need right now (YAGNI).
+
+But, remember that when you refactor your code, you should **definetly** apply SOLID principles.  
