@@ -10,6 +10,7 @@ import java.util.List;
 public class Relationships {
   private final List<Triplet<Person, Relationship, Person>> relations = new ArrayList<>();
 
+  // D.I.P violated. exposing internal storage implementation
   public List<Triplet<Person, Relationship, Person>> getRelations() {
     return relations;
   }

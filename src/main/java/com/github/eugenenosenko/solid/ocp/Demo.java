@@ -9,6 +9,7 @@ import com.github.eugenenosenko.solid.ocp.good.BetterFilter;
 import com.github.eugenenosenko.solid.ocp.good.ColorSpecification;
 import com.github.eugenenosenko.solid.ocp.good.SizeSpecification;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Demo {
@@ -18,7 +19,7 @@ public class Demo {
     Product house = new Product("House", Color.BLUE, Size.LARGE);
 
     // old implementation
-    List<Product> products = List.of(apple, tree, house);
+    List<Product> products = Arrays.asList(apple, tree, house);
     ProductFilter pf = new ProductFilter();
     pf.filterByColor(products, Color.GREEN)
         .forEach(p -> System.out.println(" - " + p.name + " is green"));
